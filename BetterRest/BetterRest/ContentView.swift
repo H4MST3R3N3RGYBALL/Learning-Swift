@@ -37,7 +37,13 @@ struct ContentView: View {
         .toolbar {
             Button("Calculate", action: calculateBedTime)
         }
+        .alert(alertTitle, isPresented: $showingAlert) {
+            Button("OK") {}
+        } message: {
+            Text(alertMessage)
+        }
     }
+    
     func calculateBedTime() {
         do {
             let config = MLModelConfiguration()
@@ -50,11 +56,15 @@ struct ContentView: View {
             let prediction = try model.prediction(wake: Double(hour + minute), estimatedSleep: sleepAmount, coffee: Double(coffeeAmount))
             
             let sleepTime = wakeUp - prediction.actualSleep
+            alertTitle = "Your ideal bedtime is..."
+            alertMessage = sleepTime.formatted(date: .omitted, time: .shortened)
             
         }
         catch {
-            
+            alertTitle = "ERROR"
+            alertMessage = "Sorry, there was a provlem calcuating your bedtime"
         }
+        showingAlert = true
     }
 }
 
